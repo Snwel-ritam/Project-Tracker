@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel-Style Checklist Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 98%;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 18px 25px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        header h1 i {
+            color: #3498db;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            padding: 15px 25px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 9px 18px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: white;
+            color: #333;
+        }
+
+        .btn:hover {
+            background-color: #f1f1f1;
+            border-color: #999;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 200px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-size: 13px;
+        }
+
+        .input-group input {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* Excel-like table */
+        .table-container {
+            overflow-x: auto;
+            max-height: 65vh;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1300px;
+        }
+
+        thead {
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #2c3e50;
+            border-bottom: 2px solid #ddd;
+            border-right: 1px solid #ddd;
+            white-space: nowrap;
+            font-size: 14px;
+            background-color: #f8f9fa;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            border-right: 1px solid #e0e0e0;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .sr-no {
+            font-weight: 600;
+            color: #2c3e50;
+            width: 60px;
+            text-align: center;
+            background-color: #f8f9fa;
+        }
+
+        .page-name-cell {
+            width: 250px;
+        }
+
+        .page-name-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .page-name-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+        }
+
+        .status-cell {
+            width: 120px;
+        }
+
+        .status-select {
+            width: 100%;
+            padding: 7px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 13px;
+            cursor: pointer;
+            background-color: white;
+        }
+
+        .status-select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        /* Color coding for status */
+        .status-yes {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-no {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-na {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+
+        .comment-cell {
+            width: 250px;
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+
+        .comment-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        /* Actions cell */
+        .action-cell {
+            width: 100px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #ddd;
+            background-color: white;
+        }
+
+        .action-btn:hover {
+            background-color: #f1f1f1;
+        }
+
+        .delete-btn:hover {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        /* Footer with stats */
+        .footer {
+            padding: 15px 25px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats {
+            display: flex;
+            gap: 25px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+
+        .save-status {
+            color: #28a745;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* No data message */
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .no-data i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+
+        /* New row highlight */
+        .new-row {
+            background-color: #f0f8ff !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .control-panel {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .input-group {
+                width: 100%;
+            }
+            
+            .footer {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .stats {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-file-excel"></i> Excel-Style Checklist Tracker</h1>
+            <p class="subtitle">Add pages as rows, track status with dropdowns. Data auto-saves to your browser.</p>
+        </header>
+        
+        <div class="control-panel">
+            <div class="input-group">
+                <label for="pageName"><i class="fas fa-file"></i> Page Name</label>
+                <input type="text" id="pageName" placeholder="Enter page name (e.g., index.html)">
+            </div>
+            
+            <button id="addRowBtn" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add New Row
+            </button>
+            
+            <button id="addSampleBtn" class="btn">
+                <i class="fas fa-vial"></i> Add Sample Data
+            </button>
+            
+            <button id="exportBtn" class="btn">
+                <i class="fas fa-download"></i> Export to CSV
+            </button>
+        </div>
+        
+        <div class="table-container">
+            <table id="checklistTable">
+                <thead>
+                    <tr>
+                        <th class="sr-no">Sr No</th>
+                        <th class="page-name-cell">Page Name</th>
+                        <th class="status-cell">UI Clean</th>
+                        <th class="status-cell">Fonts Readable</th>
+                        <th class="status-cell">Images Display</th>
+                        <th class="status-cell">Data Values</th>
+                        <th class="status-cell">Units Clear</th>
+                        <th class="status-cell">Buttons Work</th>
+                        <th class="status-cell">API Loads</th>
+                        <th class="status-cell">Error Messages</th>
+                        <th class="status-cell">Desktop View</th>
+                        <th class="status-cell">Mobile View</th>
+                        <th class="comment-cell">Comment / Status</th>
+                        <th class="action-cell">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Rows will be dynamically added here -->
+                </tbody>
+            </table>
+            
+            <div id="noDataMessage" class="no-data">
+                <i class="fas fa-clipboard-list"></i>
+                <h3>No checklist data yet</h3>
+                <p>Add your first page using the "Add New Row" button above.</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalPages">0</div>
+                    <div class="stat-label">Total Pages</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="completedChecks">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="pendingChecks">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+            </div>
+            
+            <div class="save-status" id="saveStatus">
+                <i class="fas fa-check-circle"></i>
+                <span>All changes saved automatically</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check items (columns)
+        const checkItems = [
+            "UI Clean",
+            "Fonts Readable", 
+            "Images Display",
+            "Data Values",
+            "Units Clear",
+            "Buttons Work",
+            "API Loads",
+            "Error Messages",
+            "Desktop View",
+            "Mobile View"
+        ];
+
+        // Status options
+        const statusOptions = ["", "Yes", "No", "Pending", "N/A"];
+
+        // Load data from localStorage or initialize
+        let checklistData = JSON.parse(localStorage.getItem('excelChecklistData')) || [];
+        let currentId = checklistData.length > 0 ? Math.max(...checklistData.map(item => item.id)) + 1 : 1;
+
+        // DOM elements
+        const tableBody = document.getElementById('tableBody');
+        const noDataMessage = document.getElementById('noDataMessage');
+        const pageNameInput = document.getElementById('pageName');
+        const addRowBtn = document.getElementById('addRowBtn');
+        const addSampleBtn = document.getElementById('addSampleBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const saveStatus = document.getElementById('saveStatus');
+        
+        // Stats elements
+        const totalPagesEl = document.getElementById('totalPages');
+        const completedChecksEl = document.getElementById('completedChecks');
+        const pendingChecksEl = document.getElementById('pendingChecks');
+
+        // Initialize the table
+        function initTable() {
+            renderTable();
+            updateStats();
+        }
+
+        // Render the table with data
+        function renderTable() {
+            tableBody.innerHTML = '';
+            
+            if (checklistData.length === 0) {
+                noDataMessage.style.display = 'block';
+                return;
+            }
+            
+            noDataMessage.style.display = 'none';
+            
+            // Create rows for each page
+            checklistData.forEach((page, index) => {
+                const row = document.createElement('tr');
+                row.id = `row-${page.id}`;
+                
+                // Sr No cell
+                const srNoCell = document.createElement('td');
+                srNoCell.className = 'sr-no';
+                srNoCell.textContent = index + 1;
+                row.appendChild(srNoCell);
+                
+                // Page Name cell
+                const pageNameCell = document.createElement('td');
+                pageNameCell.className = 'page-name-cell';
+                
+                const pageNameInput = document.createElement('input');
+                pageNameInput.type = 'text';
+                pageNameInput.className = 'page-name-input';
+                pageNameInput.value = page.name;
+                pageNameInput.placeholder = "Page name";
+                
+                pageNameInput.addEventListener('change', function() {
+                    page.name = this.value;
+                    saveData();
+                    showSaveStatus();
+                });
+                
+                pageNameCell.appendChild(pageNameInput);
+                row.appendChild(pageNameCell);
+                
+                // Check item status cells (dropdowns)
+                checkItems.forEach((checkItem, checkIndex) => {
+                    const statusCell = document.createElement('td');
+                    statusCell.className = 'status-cell';
+                    
+                    const statusSelect = document.createElement('select');
+                    statusSelect.className = 'status-select';
+                    
+                    // Set the status value from data or default to empty
+                    const statusValue = page.statuses[checkIndex] || '';
+                    statusSelect.value = statusValue;
+                    
+                    // Add class based on status value
+                    if (statusValue === 'Yes') statusSelect.classList.add('status-yes');
+                    if (statusValue === 'No') statusSelect.classList.add('status-no');
+                    if (statusValue === 'Pending') statusSelect.classList.add('status-pending');
+                    if (statusValue === 'N/A') statusSelect.classList.add('status-na');
+                    
+                    // Add options
+                    statusOptions.forEach(option => {
+                        const optionEl = document.createElement('option');
+                        optionEl.value = option;
+                        optionEl.textContent = option === '' ? '-- Select --' : option;
+                        statusSelect.appendChild(optionEl);
+                    });
+                    
+                    // Add event listener for status change
+                    statusSelect.addEventListener('change', function() {
+                        // Update the data
+                        page.statuses[checkIndex] = this.value;
+                        
+                        // Update the class
+                        this.className = 'status-select';
+                        if (this.value === 'Yes') this.classList.add('status-yes');
+                        if (this.value === 'No') this.classList.add('status-no');
+                        if (this.value === 'Pending') this.classList.add('status-pending');
+                        if (this.value === 'N/A') this.classList.add('status-na');
+                        
+                        saveData();
+                        updateStats();
+                        showSaveStatus();
+                    });
+                    
+                    statusCell.appendChild(statusSelect);
+                    row.appendChild(statusCell);
+                });
+                
+                // Comment cell
+                const commentCell = document.createElement('td');
+                commentCell.className = 'comment-cell';
+                
+                const commentInput = document.createElement('input');
+                commentInput.type = 'text';
+                commentInput.className = 'comment-input';
+                commentInput.value = page.comment || '';
+                commentInput.placeholder = "Add comment...";
+                
+                commentInput.addEventListener('change', function() {
+                    page.comment = this.value;
+                    saveData();
+                    showSaveStatus();
+                });
+                
+                commentCell.appendChild(commentInput);
+                row.appendChild(commentCell);
+                
+                // Actions cell
+                const actionCell = document.createElement('td');
+                actionCell.className = 'action-cell';
+                
+                const actionButtons = document.createElement('div');
+                actionButtons.className = 'action-buttons';
+                
+                // Delete button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'action-btn delete-btn';
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteBtn.title = 'Delete this row';
+                deleteBtn.addEventListener('click', function() {
+                    deleteRow(page.id);
+                });
+                
+                actionButtons.appendChild(deleteBtn);
+                actionCell.appendChild(actionButtons);
+                row.appendChild(actionCell);
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Add a new row
+        function addNewRow() {
+            const pageName = pageNameInput.value.trim() || `Page-${currentId}`;
+            
+            // Create a new page with empty statuses for all check items
+            const newPage = {
+                id: currentId++,
+                name: pageName,
+                statuses: Array(checkItems.length).fill(''),
+                comment: ''
+            };
+            
+            checklistData.push(newPage);
+            saveData();
+            
+            // Clear input
+            pageNameInput.value = '';
+            
+            // Re-render table
+            renderTable();
+            updateStats();
+            showSaveStatus();
+            
+            // Highlight the new row
+            const newRow = document.getElementById(`row-${newPage.id}`);
+            if (newRow) {
+                newRow.classList.add('new-row');
+                setTimeout(() => {
+                    newRow.classList.remove('new-row');
+                }, 2000);
+                
+                // Scroll to the new row
+                newRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        // Delete a row
+        function deleteRow(id) {
+            if (!confirm('Are you sure you want to delete this row?')) return;
+            
+            const pageIndex = checklistData.findIndex(page => page.id === id);
+            if (pageIndex === -1) return;
+            
+            checklistData.splice(pageIndex, 1);
+            saveData();
+            renderTable();
+            updateStats();
+            showSaveStatus();
+        }
+
+        // Add sample data
+        function addSampleData() {
+            const samplePages = [
+                { 
+                    name: "index.html", 
+                    statuses: ["Yes", "Yes", "Yes", "Pending", "Yes", "No", "", "Yes", "Yes", "Pending"], 
+                    comment: "API integration pending" 
+                },
+                { 
+                    name: "dashboard.html", 
+                    statuses: ["Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "No", "Yes", "Yes"], 
+                    comment: "All good" 
+                },
+                { 
+                    name: "login.html", 
+                    statuses: ["Yes", "Yes", "Pending", "Yes", "Yes", "Yes", "", "Yes", "Yes", "No"], 
+                    comment: "Mobile view issues" 
+                },
+                { 
+                    name: "profile.html", 
+                    statuses: ["Yes", "Yes", "Yes", "Yes", "Yes", "Pending", "Yes", "Yes", "Yes", "Yes"], 
+                    comment: "Testing needed" 
+                }
+            ];
+            
+            samplePages.forEach(sample => {
+                const newPage = {
+                    id: currentId++,
+                    name: sample.name,
+                    statuses: sample.statuses,
+                    comment: sample.comment
+                };
+                checklistData.push(newPage);
+            });
+            
+            saveData();
+            renderTable();
+            updateStats();
+            showSaveStatus();
+        }
+
+        // Export to CSV
+        function exportToCSV() {
+            if (checklistData.length === 0) {
+                alert('No data to export');
+                return;
+            }
+            
+            let csvContent = "Sr No,Page Name";
+            
+            // Add check items as headers
+            checkItems.forEach(item => {
+                csvContent += `,"${item}"`;
+            });
+            
+            csvContent += ",Comment\n";
+            
+            // Add rows for each page
+            checklistData.forEach((page, index) => {
+                csvContent += `${index + 1},"${page.name}"`;
+                
+                // Add statuses for each check item
+                page.statuses.forEach(status => {
+                    csvContent += `,"${status || ''}"`;
+                });
+                
+                csvContent += `,"${page.comment || ''}"\n`;
+            });
+            
+            // Create and download the CSV file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'checklist_tracker.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('excelChecklistData', JSON.stringify(checklistData));
+        }
+
+        // Update statistics
+        function updateStats() {
+            totalPagesEl.textContent = checklistData.length;
+            
+            let completed = 0;
+            let pending = 0;
+            
+            checklistData.forEach(page => {
+                page.statuses.forEach(status => {
+                    if (status === 'Yes') completed++;
+                    if (status === 'Pending') pending++;
+                });
+            });
+            
+            completedChecksEl.textContent = completed;
+            pendingChecksEl.textContent = pending;
+        }
+
+        // Show save status
+        function showSaveStatus() {
+            saveStatus.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i><span>Saving...</span>';
+            
+            setTimeout(() => {
+                saveStatus.innerHTML = '<i class="fas fa-check-circle"></i><span>All changes saved</span>';
+            }, 500);
+        }
+
+        // Event listeners
+        addRowBtn.addEventListener('click', addNewRow);
+        
+        pageNameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addNewRow();
+        });
+        
+        addSampleBtn.addEventListener('click', addSampleData);
+        exportBtn.addEventListener('click', exportToCSV);
+
+        // Initialize the application
+        initTable();
+    </script>
+</body>
+</html>
